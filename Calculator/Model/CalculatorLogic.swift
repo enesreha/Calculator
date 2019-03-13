@@ -9,22 +9,54 @@
 import Foundation
 //UIKit has everything that Foundation has but also it has UI related codes like UILabel etc.
 //When we're gonna subclass something like UIViewController etc we use Cocoa Touch Class but if we're gonna create our own custom classes we're gonna use swift file.
-class CalculatorLogic{
-    var number: Double //it's not gonna have a value until we pass it over from ViewController. Because of that I don't wanna give a value to it, to be able to do that I have to initialize it when I create a new object from this class.
-    init(number: Double) {
+struct CalculatorLogic{
+    private var number: Double?
+    private var intermediateCalculation: (n1: Double, calcMethod: String)?
+    
+    //We don't need an initializer because we're in a struct
+    
+   mutating func setNumber (_ number: Double){
         self.number = number
     }
   
-    func calculate (symbol: String) -> Double?{
-        if symbol == "+/-" {
-            return number * -1
-        }
-        else if symbol == "AC"{
+   mutating func calculate (symbol: String) -> Double?{
+    
+        if let n = number{
+            
+        switch symbol{
+        case "+/-":
+            return n * -1
+        case "AC":
             return 0
-        }
-        else if symbol == "%" {
-           return number * 0.01
-        }
+        case "%":
+           return n * 0.01
+        case "=":
+            return performTwoNumCalculation(n2: n)
+        default:
+            intermediateCalculation = (n1: n, calcMethod: symbol)
+            }
+            }
      return nil
+        
 }
+    private func performTwoNumCalculation(n2: Double) -> Double?{
+        
+        if let n1 = intermediateCalculation?.n1, let operation = intermediateCalculation?.calcMethod{
+
+            switch operation{
+            case "+" :
+                return n1 + n2
+            case "-":
+                return n1 - n2
+            case "×":
+                return n1 * n2
+            case "÷":
+                return n1 / n2
+            default:
+                fatalError("The operatin passed in does not match any of the cases.")
+            }
+        }
+      
+       return nil
+    }
 }
